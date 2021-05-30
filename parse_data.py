@@ -5,9 +5,9 @@ interface_data = namedtuple('interface', ['name', 'description', 'config', 'max_
 
 # trailing coma in configClear_v2.json on line 1890 removed, json.load() was throwing error
 
-def parse_interface_data(location='configClear_v2.json'):
+def parse_interface_data(config_url):
     try:
-        with open(location, 'r', encoding='utf-8') as file:
+        with open(config_url, 'r', encoding='utf-8') as file:
             frinx_data = json.load(file)
             # frinx-uniconfig-topology:configuration/Cisco-IOS-XE-native:native/interface/
             interfaces = frinx_data['frinx-uniconfig-topology:configuration']['Cisco-IOS-XE-native:native']['interface']
@@ -27,7 +27,7 @@ def parse_interface_data(location='configClear_v2.json'):
                 if key in ['TenGigabitEthernet', 'GigabitEthernet'] and key != 'Port-channel':
                     for interface in interfaces[key]:
                         yield interface_data(
-                            name=key+interface.get('name'),
+                            name=f'{key}{interface.get("name")}',
                             description=interface.get('description'),
                             config=interface,
                             max_frame_size=interface.get('mtu'),
@@ -35,6 +35,10 @@ def parse_interface_data(location='configClear_v2.json'):
                         )
     except FileNotFoundError as e:
         print(e)
+    except KeyError as e:
+        print(f'Key missing from json file: {e}')
+    except TypeError as e:
+        print(f'Json file has wrong data type: {e}')
     except json.JSONDecodeError as e:
-        print(e)
+        print(f'Json Decode error: {e}')
             
