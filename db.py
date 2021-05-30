@@ -3,6 +3,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, JSON
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 import json
 import sys
 
@@ -63,16 +64,14 @@ def connect_to_db():
         sys.exit(e)
         
     
-
-def delete_interface_table_data(session):
-    print('Deleting old table data.')
-    session.query(Interface).delete()
-
 def create_session():
     Session = sessionmaker()
     Session.configure(bind=connect_to_db())
     return Session()
 
+def delete_interface_table_data(session):
+    print('Deleting old table data.')
+    session.query(Interface).delete()
 
 try:
     Interface.__table__.create(bind=connect_to_db(), checkfirst=True)

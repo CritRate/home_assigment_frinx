@@ -1,4 +1,3 @@
-from sqlalchemy.orm import session
 from db import create_session,add_interface, get_interface, delete_interface_table_data, Interface
 from parse_data import parse_interface_data
 
