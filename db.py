@@ -35,7 +35,22 @@ class Interface(Base):
             f'max frame size:{self.max_frame_size}\n'
         )
 
-# helper function for the assignment
+
+def get_interface(session, name):
+    return session.query(Interface).filter(Interface.name==name).one()
+
+def create_session(user, password, ip, port, db_name):
+    try:
+        engine = create_engine(f'postgresql+psycopg2://{user}:{password}@{ip}:{port}/{db_name}')
+        # create Table if it does not exist
+        Interface.__table__.create(bind=engine, checkfirst=True)
+        Session = sessionmaker()
+        Session.configure(bind=engine)
+        return Session()
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        sys.exit(e)
+
+# helper functions for the assignment
 def add_interface(session, name, description=None, config=None,port_channel_id=None,max_frame_size=None):
     if not name:
         raise ValueError('Name is required')
@@ -48,32 +63,7 @@ def add_interface(session, name, description=None, config=None,port_channel_id=N
             max_frame_size=max_frame_size
     ))
 
-def get_interface(session, name):
-    return session.query(Interface).filter(Interface.name==name).one()
-
-def connect_to_db():
-    try:
-        # placeholder data
-        user='postgres'
-        password='postgres'
-        db_name='frinx'
-        ip='localhost'
-        port='5432'
-        return create_engine(f'postgresql+psycopg2://{user}:{password}@{ip}:{port}/{db_name}')
-    except sqlalchemy.exc.SQLAlchemyError as e:
-        sys.exit(e)
-        
-    
-def create_session():
-    Session = sessionmaker()
-    Session.configure(bind=connect_to_db())
-    return Session()
-
 def delete_interface_table_data(session):
     print('Deleting old table data.')
     session.query(Interface).delete()
 
-try:
-    Interface.__table__.create(bind=connect_to_db(), checkfirst=True)
-except sqlalchemy.exc.SQLAlchemyError as e:
-    sys.exit(e) 
