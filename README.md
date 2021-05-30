@@ -1,8 +1,9 @@
-db.py/connect_to_db has placeholder data for database connection:
+Default arguments for argparse:
+
 |Parameter  | Value     |
 |-----------|-----------|
 |user       |postgres   |
-|password   |postgres   |
+|password   |           |
 |db_name    |frinx      |
 |ip         |localhost  |
 |port       |5432       |
